@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>マイページ</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
+        h1 { color: #333; }
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 300px;
+        }
+        .menu a {
+            padding: 10px;
+            background-color: #FFFF00;
+            color: black;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .menu a:hover {
+            background-color: #FFFF00;
+        }
+    </style>
+</head>
+<body>
+    <h2>マイページ</h2>
+    <p>メール: {{ user['email'] }}</p>
+    <p>パスワード: {{ user['password'] }}</p>
+    <p>名前: {{ user['name'] }}</p>
+    <p>学部: {{ user['faculty'] }}</p>
+
+    <p>履修済み: {{ user['subjects'] }}</p>
+    <div class="menu">
+        <a href="{{ url_for('edit_profile') }}">情報を編集する</a><br>
+        <a href="{{ url_for('main') }}">メインページに戻る</a>
+    </div>
+        
+</body>
+</html>

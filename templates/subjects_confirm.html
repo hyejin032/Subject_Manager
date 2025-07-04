@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>登録完了</title>
+</head>
+<body>
+    <h2>履修登録完了</h2>
+    <p>あなたが選択した科目：</p>
+    <ul>
+    {% for subject in selected %}
+        <li>{{ subject }}</li>
+    {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('main') }}">メイン画面に戻る</a>
+</body>
+</html>

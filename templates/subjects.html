@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>履修登録</title>
+</head>
+<body>
+    <h2>履修登録</h2>
+    <form method="POST">
+        {% for subject in subjects %}
+            <label>
+                <input type="checkbox" name="subjects" value="{{ subject }}">
+                {{ subject }}
+            </label><br>
+        {% endfor %}
+        <button type="submit">登録する</button>
+    </form>
+
+    <a href="{{ url_for('main') }}">メイン画面に戻る</a>
+</body>
+</html>
