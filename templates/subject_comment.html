@@ -1,18 +1,18 @@
+<!-- subjects.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>メイン画面</title>
+    <title>科目一覧</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
         h1 { color: #333; }
-        .menu {
+        .subject-list {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            max-width: 300px;
         }
-        .menu a {
+        .subject-list a {
             padding: 10px;
             background-color: #FFFF00;
             color: black;
@@ -20,18 +20,19 @@
             text-align: center;
             border-radius: 5px;
         }
-        .menu a:hover {
-            background-color: #FFFF00;
+        .subject-list a:hover {
+            background-color: #FFFF99;
         }
     </style>
 </head>
 <body>
-    <h1>メイン画面へようこそ</h1>
-    <div class="menu">
-        <a href="{{url_for('subjects')}}">履修科目</a>
-        <a href="{{url_for('mypage')}}">マイページ</a>
-        <a href="{{url_for('subject_comment')}}">コメント欄</a>
-        <a href="{{url_for('board')}}">掲示板</a>
+    <h1>科目一覧</h1>
+    <div class="subject-list">
+        {% for subject in subjects %}
+        <a href="{{ url_for('view_comments', subject=subject) }}">{{ subject }}</a>
+        {% endfor %}
     </div>
+    <br>
+    <a href="{{ url_for('main') }}">メインページに戻る</a>
 </body>
 </html>

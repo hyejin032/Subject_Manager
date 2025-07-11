@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <title>登録完了</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科目登録確認</title>
 </head>
 <body>
-    <h2>履修登録完了</h2>
-    <p>あなたが選択した科目：</p>
+    <h1>科目登録確認</h1>
+    <p>{{ message }}</p>
     <ul>
     {% for subject in selected %}
         <li>{{ subject }}</li>
+    {% else %}
+        <p>科目が選択されませんでした。</p>
     {% endfor %}
     </ul>
-
-    <a href="{{ url_for('main') }}">メイン画面に戻る</a>
+    <hr>
+    <a href="{{ url_for('subjects') }}">科目登録を続ける</a><br>
+    <a href="{{ url_for('mypage') }}">マイページで確認する</a><br>
+    <a href="{{ url_for('main') }}">メインページに戻る</a>
 </body>
 </html>

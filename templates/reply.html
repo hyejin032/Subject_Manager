@@ -1,0 +1,25 @@
+<!-- reply.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>返信</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
+        h1 { color: #333; }
+        .form-container { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>投稿への返信</h1>
+    <p>返信内容を入力してください（300字以内）</p>
+
+    <form method="POST">
+        <textarea name="content" maxlength="300" required></textarea><br>
+        <button type="submit">確認</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('board') }}">掲示板に戻る</a>
+</body>
+</html>

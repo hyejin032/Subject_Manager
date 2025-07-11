@@ -1,0 +1,38 @@
+<!-- board.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>掲示板</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
+        h1 { color: #333; }
+        .post { margin-bottom: 20px; }
+        .post p { background-color: #FFF9C4; padding: 10px; border-radius: 5px; }
+        .reply-button { padding: 5px 10px; background-color: #FFEB3B; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>掲示板</h1>
+    
+    <div class="post-list">
+        {% for post in posts %}
+        <div class="post">
+            <p><strong>匿名</strong>: {{ post.content }}</p>
+            <p>投稿日: {{ post.created_at }}</p>
+            <a href="{{ url_for('reply', post_id=post.id) }}" class="reply-button">返信</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <br>
+    <a href="{{ url_for('board') }}">掲示板に戻る</a>
+    <br>
+    <br>
+    <h2>新規投稿</h2>
+    <form method="POST">
+        <textarea name="content" maxlength="300" required></textarea><br>
+        <button type="submit">投稿確認</button>
+    </form>
+</body>
+</html>

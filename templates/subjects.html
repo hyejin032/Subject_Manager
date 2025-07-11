@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <title>履修登録</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科目登録</title>
 </head>
 <body>
-    <h2>履修登録</h2>
-    <form method="POST">
+    <h1>科目登録</h1>
+    <p>登録したい科目にチェックを入れて、登録ボタンを押してください。</p>
+    <hr>
+    <form method="post">
+        <h3>科目一覧</h3>
         {% for subject in subjects %}
-            <label>
-                <input type="checkbox" name="subjects" value="{{ subject }}">
-                {{ subject }}
-            </label><br>
+        <label>
+            <input type="checkbox" name="subjects" value="{{ subject }}">
+            {{ subject }}
+        </label><br>
         {% endfor %}
-        <button type="submit">登録する</button>
+        <br>
+        <button type="submit" name="action" value="completed">履修済みとして登録</button>
+        <button type="submit" name="action" value="planned">履修予定として登録</button>
     </form>
-
-    <a href="{{ url_for('main') }}">メイン画面に戻る</a>
+    <br>
+    <a href="{{ url_for('main') }}">メインページに戻る</a>
 </body>
 </html>
