@@ -4,6 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>科目登録</title>
+    <style>
+        .ps {
+            background-color: #03AC13; 
+            color: white;
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+        .cs {
+            background-color: #3DED97; 
+            color: white;
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <h1>科目登録</h1>
@@ -18,8 +42,8 @@
         </label><br>
         {% endfor %}
         <br>
-        <button type="submit" name="action" value="completed">履修済みとして登録</button>
-        <button type="submit" name="action" value="planned">履修予定として登録</button>
+        <button type="submit" name="action" value="completed" class="cs">履修済みとして登録</button>
+        <button type="submit" name="action" value="planned" class="ps">履修予定として登録</button>
     </form>
     <br>
     <a href="{{ url_for('main') }}">メインページに戻る</a>

@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイページ</title>
+    <style>
+        .new-post-form {
+            background-color: #5C6fF2; 
+            color: white;
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <h1>マイページ</h1>
@@ -39,9 +52,19 @@
     {% endif %}
     
     <hr>
-    <a href="{{ url_for('edit_profile') }}">プロフィール編集</a><br>
-    <a href="{{ url_for('subjects') }}">科目登録・編集</a><br>
-    <a href="{{ url_for('main') }}">メインページに戻る</a><br>
-    <a href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu">
+        <form action="{{ url_for('edit_profile') }}" method="get">
+            <button type="submit" class="new-post-form">プロフィール編集</button>
+        </form>
+        <form action="{{ url_for('subjects') }}" method="get">
+            <button type="submit" class="new-post-form">科目登録・編集</button>
+        </form>
+        <form action="{{ url_for('main') }}" method="get">
+            <button type="submit" class="new-post-form">メインページに戻る</button>
+        </form>
+        <form action="{{ url_for('logout') }}" method="get">
+            <button type="submit" class="new-post-form">ログアウト</button>
+        </form>
+    </div>
 </body>
 </html>

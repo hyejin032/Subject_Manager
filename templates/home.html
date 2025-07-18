@@ -2,14 +2,27 @@
 <html>
 <head>
     <title>ホーム</title>
+    <style>
+        .si {
+            background-color: #20284B; 
+            color: white;
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
-    <h1>ようこそ</h1>
+    <h1>Subject Manager</h1>
     <form action="/login">
-        <button type="submit">ログイン</button>
+        <button type="submit" class="si">ログイン</button>
     </form>
     <form action="/signup">
-        <button type="submit">サインイン</button>
+        <button type="submit" class="si">サインイン</button>
     </form>
 </body>
 </html>

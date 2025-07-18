@@ -29,6 +29,23 @@
         .delete-container {
             margin-top: 20px;
         }
+        .comment-button, .delete-button { 
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+        .comment-button {
+            background-color: #FFE352; 
+            color: #333;
+        }
+        .delete-button {
+            background-color: #f44336; /* 赤色 */
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -42,7 +59,7 @@
             <!-- 削除ボタン -->
             {% if comment.user_email == session['user_email'] %}
             <form action="{{ url_for('view_comments', subject=subject) }}" method="POST" style="display:inline;">
-                <button type="submit" name="delete_comment" value="{{ comment.comment }}">削除</button>
+                <button type="submit" name="delete_comment" value="{{ comment.comment }}" class="delete-button">削除</button>
             </form>
             {% endif %}
         </p>
@@ -54,7 +71,7 @@
         <h3>新しいコメント</h3>
         <form action="{{ url_for('view_comments', subject=subject) }}" method="POST">
             <textarea name="comment" maxlength="50" placeholder="コメントを入力..." required></textarea><br>
-            <button type="submit">コメント確認</button>
+            <button type="submit" class="comment-button">コメント確認</button>
         </form>
     </div>
 
