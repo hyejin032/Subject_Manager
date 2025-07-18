@@ -160,11 +160,6 @@ def signup():
     
     return render_template('signup.html')
 
-@app.route('/logout')
-def logout():
-    session.pop('user_email', None)
-    return redirect(url_for('home'))
-
 @app.route('/main')
 def main():
     if 'user_email' not in session:
