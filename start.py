@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import csv
 import os
+import uuid
 from datetime import datetime
 
 app = Flask("Subject Manager")
@@ -47,6 +48,7 @@ def load_comments(subject):
                 for row in reader:
                     if row['subject'] == subject:
                         comments.append({
+                            'comment_id': row['comment_id'],  
                             'user_email': row['user_email'],
                             'comment': row['comment']
                         })
@@ -56,24 +58,17 @@ def load_comments(subject):
     return comments
 
 # コメントを保存する関数
-def save_comment(subject, comment_text, user_email):
-    try:
-        # コメントがなければ、ファイルのヘッダーを作成
-        if not os.path.exists(COMMENTS_CSV_FILE):
-            with open(COMMENTS_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=['subject', 'user_email', 'comment'])
-                writer.writeheader()
-        
-        # コメントをファイルに追加
-        with open(COMMENTS_CSV_FILE, mode='a', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=['subject', 'user_email', 'comment'])
-            writer.writerow({
-                'subject': subject,
-                'user_email': user_email,
-                'comment': comment_text
-            })
-    except IOError as e:
-        print(f"Error saving comment: {e}")
+
+def save_comment(subject, comment, user_email):
+    comment_id = str(uuid.uuid4())  # 一意なID
+    with open(COMMENTS_CSV_FILE, mode='a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=['comment_id', 'subject', 'user_email', 'comment'])
+        writer.writerow({
+            'comment_id': comment_id,
+            'subject': subject,
+            'user_email': user_email,
+            'comment': comment
+        })
 
 
 def load_all_users():
@@ -316,30 +311,28 @@ def view_comments(subject):
             return redirect(url_for('view_comments', subject=subject))
 
         if 'delete_comment' in request.form:
-            # 削除ボタンが押された場合
             comment_id = request.form['delete_comment']
-            delete_comment(subject, comment_id)  # コメントを削除
-            return redirect(url_for('view_comments', subject=subject))
+            delete_comment(subject, comment_id)
+        return redirect(url_for('view_comments', subject=subject))
 
     return render_template('comment_page.html', subject=subject, comments=comments)
 
-def delete_comment(subject, comment_text):
+def delete_comment(subject, comment_id):
     try:
-        # 既存のコメントを読み込む
         comments = []
         with open(COMMENTS_CSV_FILE, mode='r', newline='', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if row['subject'] == subject and row['comment'] != comment_text:
+                if not (row['subject'] == subject and row['comment_id'] == comment_id):
                     comments.append(row)
 
-        # 更新されたコメントリストをファイルに書き込み
         with open(COMMENTS_CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=['subject', 'user_email', 'comment'])
+            writer = csv.DictWriter(f, fieldnames=['comment_id', 'subject', 'user_email', 'comment'])
             writer.writeheader()
             writer.writerows(comments)
     except (IOError, csv.Error) as e:
         print(f"Error deleting comment: {e}")
+
 
 @app.route('/board', methods=['GET', 'POST'])
 def board():

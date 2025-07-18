@@ -59,7 +59,7 @@
             <!-- 削除ボタン -->
             {% if comment.user_email == session['user_email'] %}
             <form action="{{ url_for('view_comments', subject=subject) }}" method="POST" style="display:inline;">
-                <button type="submit" name="delete_comment" value="{{ comment.comment }}" class="delete-button">削除</button>
+                <button type="submit" name="delete_comment" value="{{ comment.comment_id }}" class="delete-button">削除</button>
             </form>
             {% endif %}
         </p>
