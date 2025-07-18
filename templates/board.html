@@ -1,15 +1,85 @@
-<!-- board.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>掲示板</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
-        h1 { color: #333; }
-        .post { margin-bottom: 20px; }
-        .post p { background-color: #FFF9C4; padding: 10px; border-radius: 5px; }
-        .reply-button { padding: 5px 10px; background-color: #FFEB3B; cursor: pointer; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            background-color: #f4f4f9; 
+        }
+        h1, h2 { 
+            color: #333; 
+        }
+        .post { 
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px; 
+        }
+        .post p {
+            margin: 5px 0;
+        }
+        .post-info {
+            font-size: 0.8em;
+            color: #666;
+        }
+        .replies {
+            margin-top: 15px;
+            padding-left: 20px;
+            margin-left: 20px;
+            border-left: 3px solid #e0e0e0;
+        }
+        .reply {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .actions {
+            margin-top: 10px;
+        }
+        .reply-button, .delete-button { 
+            display: inline-block;
+            padding: 5px 10px; 
+            cursor: pointer; 
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.9em;
+        }
+        .reply-button {
+            background-color: #FFEB3B; 
+            color: #333;
+        }
+        .delete-button {
+            background-color: #f44336; /* 赤色 */
+            color: white;
+        }
+        .new-post-form {
+             background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .new-post-form button {
+            padding: 10px 15px;
+            background-color: #5c67f2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -18,21 +88,44 @@
     <div class="post-list">
         {% for post in posts %}
         <div class="post">
-            <p><strong>匿名</strong>: {{ post.content }}</p>
-            <p>投稿日: {{ post.created_at }}</p>
-            <a href="{{ url_for('reply', post_id=post.id) }}" class="reply-button">返信</a>
+            <p class="post-info">ID: {{ post.id }} | 投稿者: {{ post.user_email }} | {{ post.created_at }}</p>
+            <p>{{ post.content }}</p>
+            
+            <div class="replies">
+                {% for reply in post.replies %}
+                <div class="reply">
+                    <p class="post-info">返信者: {{ reply.user_email }} | {{ reply.created_at }}</p>
+                    <p>{{ reply.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="actions">
+                <a href="{{ url_for('reply', post_id=post.id) }}" class="reply-button">この投稿に返信する</a>
+                
+                <!-- 投稿者本人の場合にのみ削除ボタンを表示 -->
+                {% if session.user_email == post.user_email %}
+                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="display: inline;" onsubmit="return confirm('本当にこの投稿と返信をすべて削除しますか？');">
+                    <button type="submit" class="delete-button">削除</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
 
     <br>
-    <a href="{{ url_for('board') }}">掲示板に戻る</a>
+    
+    <div class="new-post-form">
+        <h2>新規投稿</h2>
+        <form method="POST">
+            <textarea name="content" maxlength="300" required></textarea><br>
+            <button type="submit">投稿する</button>
+        </form>
+    </div>
+
     <br>
-    <br>
-    <h2>新規投稿</h2>
-    <form method="POST">
-        <textarea name="content" maxlength="300" required></textarea><br>
-        <button type="submit">投稿確認</button>
-    </form>
+    <a href="{{ url_for('main') }}">メインページに戻る</a>
+
 </body>
 </html>

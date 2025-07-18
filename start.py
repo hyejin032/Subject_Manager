@@ -10,6 +10,7 @@ SUBJECTS_CSV_FILE = 'subjects.csv'
 COMMENTS_CSV_FILE = 'comments.csv'
 ARTICLE_CSV_FILE = 'article.csv'
 FIELDNAMES = ['email', 'name', 'password', 'faculty', 'c_subjects', 'p_subjects']
+ARTICLE_FIELDNAMES = ['id', 'parent_id', 'user_email', 'content', 'created_at']
 
 # --- CSV Helper Functions ---
 def load_articles():
@@ -26,31 +27,15 @@ def load_articles():
         print("DEBUG - article.csv not found")
     return articles
 
-def save_article(user_email, content, parent_id=None):
-    """新しい投稿または返信を保存"""
-    new_id = 1
-    articles = load_articles()
-    
-    if articles:
-        new_id = max(int(article['id']) for article in articles) + 1  # 最新のIDを生成
-
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    article = {
-        'id': str(new_id),
-        'parent_id': parent_id,  # 親投稿がある場合は親ID
-        'user_email': user_email,
-        'content': content,
-        'created_at': timestamp
-    }
-
-    # 既存の投稿に追加
-    articles.append(article)
-
-    with open(ARTICLE_CSV_FILE, mode='w', newline='', encoding='utf-8-sig') as file:
-        fieldnames = ['id', 'parent_id', 'user_email', 'content', 'created_at']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(articles)
+def save_article(articles):
+    """掲示板の全投稿を保存する"""
+    try:
+        with open(ARTICLE_CSV_FILE, mode='w', newline='', encoding='utf-8-sig') as file:
+            writer = csv.DictWriter(file, fieldnames=ARTICLE_FIELDNAMES)
+            writer.writeheader()
+            writer.writerows(articles)
+    except Exception as e:
+        print(f"Error saving articles: {e}")
 
 def load_comments(subject):
     comments = []
@@ -366,38 +351,121 @@ def board():
     if 'user_email' not in session:
         return redirect(url_for('login'))
 
-    articles = load_articles()
-    # 親投稿と返信を分ける
-    posts = [article for article in articles if article['parent_id'] is None]
-    
     if request.method == 'POST':
-        # 投稿または返信の保存
-        content = request.form['content']
-        parent_id = request.form.get('parent_id')
+        content = request.form.get('content')
         user_email = session['user_email']
         
-        save_article(user_email, content, parent_id)
+        if content:
+            articles = load_articles()
+            new_id = 1
+            if articles:
+                valid_ids = [int(a['id']) for a in articles if a.get('id') and a['id'].isdigit()]
+                if valid_ids:
+                    new_id = max(valid_ids) + 1
+
+            new_article = {
+                'id': str(new_id),
+                'parent_id': '',
+                'user_email': user_email,
+                'content': content,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            articles.append(new_article)
+            save_article(articles)
+        
         return redirect(url_for('board'))
-    print("DEBUG - posts:", posts)
+
+    # GETリクエスト: 親投稿とそれに紐づく返信を整理して表示
+    all_articles = load_articles()
+    articles_dict = {article['id']: article for article in all_articles}
+
+    for article in articles_dict.values():
+        article['replies'] = []
+
+    posts = []
+    for article in articles_dict.values():
+        parent_id = article.get('parent_id')
+        if parent_id and parent_id in articles_dict:
+            articles_dict[parent_id]['replies'].append(article)
+        else:
+            posts.append(article)
     
+    posts.sort(key=lambda p: int(p.get('id', 0)), reverse=True)
+    for post in posts:
+        post['replies'].sort(key=lambda r: int(r.get('id', 0)))
+
     return render_template('board.html', posts=posts)
 
 @app.route('/reply/<int:post_id>', methods=['GET', 'POST'])
 def reply(post_id):
     if 'user_email' not in session:
         return redirect(url_for('login'))
-    
+
+    articles = load_articles()
+    parent_post = next((article for article in articles if article.get('id') == str(post_id)), None)
+
+    if not parent_post:
+        return "投稿が見つかりません。", 404
+
     if request.method == 'POST':
-        content = request.form['content']
+        content = request.form.get('content')
         user_email = session['user_email']
+
+        if content:
+            new_id = 1
+            if articles:
+                valid_ids = [int(a['id']) for a in articles if a.get('id') and a['id'].isdigit()]
+                if valid_ids:
+                    new_id = max(valid_ids) + 1
+            
+            new_reply = {
+                'id': str(new_id),
+                'parent_id': str(post_id),
+                'user_email': user_email,
+                'content': content,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            articles.append(new_reply)
+            save_article(articles)
         
-        # 返信を保存
-        save_article(user_email, content, parent_id=post_id)
         return redirect(url_for('board'))
+
+    # GETリクエスト: 親投稿と既存の返信を表示
+    replies = [reply for reply in articles if reply.get('parent_id') == str(post_id)]
+    replies.sort(key=lambda r: int(r.get('id', 0)))
+
+    return render_template('reply.html', post=parent_post, replies=replies)
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    """投稿とその返信を削除する"""
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+
+    post_id_to_delete = str(post_id)
+    user_email = session['user_email']
+    all_articles = load_articles()
+
+    # 削除対象の投稿を特定
+    post_to_delete = next((p for p in all_articles if p.get('id') == post_id_to_delete), None)
+
+    # 投稿が存在しない、または投稿者本人でない場合は何もしない
+    if not post_to_delete or post_to_delete.get('user_email') != user_email:
+        return redirect(url_for('board'))
+
+    # 削除する投稿(親)のIDと、その返信のIDをリストアップ
+    ids_to_remove = {post_id_to_delete}
+    # この実装では返信にさらに返信はできないため、1階層のみチェック
+    for article in all_articles:
+        if article.get('parent_id') == post_id_to_delete:
+            ids_to_remove.add(article.get('id'))
+
+    # 削除対象以外の投稿だけを残す
+    articles_to_keep = [p for p in all_articles if p.get('id') not in ids_to_remove]
     
-    return render_template('reply.html', post_id=post_id)
+    save_article(articles_to_keep)
 
-
+    return redirect(url_for('board'))
 
 
 if __name__ == '__main__':

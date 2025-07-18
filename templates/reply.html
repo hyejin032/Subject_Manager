@@ -1,24 +1,47 @@
-<!-- reply.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>返信</title>
+    <title>返信する</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 40px; background-color: #f0f0f0; }
-        h1 { color: #333; }
-        .form-container { margin-top: 20px; }
+        h1, h2 { color: #333; }
+        .original-post { background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbdefb; }
+        .post-info { font-size: 0.8em; color: #555; }
+        .existing-replies { margin-top: 20px; }
+        .reply { background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+        form textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        form button { padding: 10px 20px; background-color: #FFEB3B; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>投稿への返信</h1>
-    <p>返信内容を入力してください（300字以内）</p>
+    <h1>返信する</h1>
 
+    <h2>元の投稿</h2>
+    <div class="original-post">
+        <p class="post-info">ID: {{ post.id }} | 投稿者: {{ post.user_email }} | {{ post.created_at }}</p>
+        <p>{{ post.content }}</p>
+    </div>
+
+    <div class="existing-replies">
+        <h3>現在の返信</h3>
+        {% for reply in replies %}
+            <div class="reply">
+                <p class="post-info">ID: {{ reply.id }} | 返信者: {{ reply.user_email }} | {{ reply.created_at }}</p>
+                <p>{{ reply.content }}</p>
+            </div>
+        {% else %}
+            <p>まだ返信はありません。</p>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>返信内容を投稿</h2>
     <form method="POST">
-        <textarea name="content" maxlength="300" required></textarea><br>
-        <button type="submit">確認</button>
+        <textarea name="content" rows="5" maxlength="300" required></textarea><br>
+        <button type="submit">返信を投稿する</button>
     </form>
-
     <br>
     <a href="{{ url_for('board') }}">掲示板に戻る</a>
 </body>
